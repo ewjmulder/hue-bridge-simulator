@@ -1,2 +1,3 @@
-hue-simulator
+Hue Bridge Simulator
 =============
+TODO: documentation
