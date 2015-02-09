@@ -12,9 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Make it possible to call this service cross-site.
+ */
 @Component
 public class CORSFilter implements Filter {
 
+    @Override
     public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain) throws IOException, ServletException {
         final HttpServletResponse response = (HttpServletResponse) res;
         response.setHeader("Access-Control-Allow-Origin", "*");
@@ -24,9 +28,11 @@ public class CORSFilter implements Filter {
         chain.doFilter(req, res);
     }
 
+    @Override
     public void init(final FilterConfig filterConfig) {
     }
 
+    @Override
     public void destroy() {
     }
 

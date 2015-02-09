@@ -1,5 +1,8 @@
-package com.programyourhome.huebridgesimulator.model;
+package com.programyourhome.huebridgesimulator.model.connection;
 
+/**
+ * JSON DTO for the api response of connecting a new user.
+ */
 public class ConnectedSuccesfully {
 
     private Username success;

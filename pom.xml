@@ -22,10 +22,64 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>src/main/resources/com/programyourhome/huebridgesimulator/config/properties/simulator.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <file>target/classes/description.xml</file>
+                    <replacements>
+                        <replacement>
+                            <token>\[HOST\]</token>
+                            <value>${simulator.host}</value>
+                        </replacement>
+                        <replacement>
+                            <token>\[PORT\]</token>
+                            <value>${simulator.port}</value>
+                        </replacement>
+                        <replacement>
+                            <token>\[MAC\]</token>
+                            <value>${simulator.mac}</value>
+                        </replacement>
+                    </replacements>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>philips-hue</groupId>
+            <artifactId>huesdkresources</artifactId>
+            <version>2.0</version>
+        </dependency>
+    
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>

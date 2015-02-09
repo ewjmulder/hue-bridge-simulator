@@ -18,20 +18,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
+/**
+ * This part of the simulator mimics the UPnP behavior from the Hue bridge as closely as possible.
+ * This means: every minute 6 NOTIFY massages will be sent. Three different messages, each one sent twice.
+ * The messages contain information about the Hue bridge device. Their content is exactly identical to the
+ * ones from an actual bridge, except for the 'LOCATION:' and 'uuid:' parts.
+ *
+ * TODO: Implement listening to and responding to M-SEARCH UPnP queries.
+ *
+ * Credits: This code is based on sources in https://github.com/ps3mediaserver/
+ */
 @Component
 @PropertySource("classpath:com/programyourhome/huebridgesimulator/config/properties/simulator.properties")
-// Code based on sources in https://github.com/ps3mediaserver/
 public class HueBridgeUpnpSimulator {
 
     // Line feed used in UPnP traffic.
     private final static String CRLF = "\r\n";
 
-    // IPv4 Multicast channel reserved for SSDP by Internet Assigned Numbers Authority (IANA).
-    // MUST be 239.255.255.250.
+    // IPv4 Multicast channel reserved for SSDP by Internet Assigned Numbers Authority (IANA), must be 239.255.255.250.
     private final static String IPV4_UPNP_HOST = "239.255.255.250";
 
-    // Multicast channel reserved for SSDP by Internet Assigned Numbers Authority (IANA).
-    // MUST be 1900.
+    // Multicast channel reserved for SSDP by Internet Assigned Numbers Authority (IANA), must be 1900.
     private final static int UPNP_PORT = 1900;
 
     private static InetAddress getUPNPAddress() throws IOException {
@@ -74,7 +81,6 @@ public class HueBridgeUpnpSimulator {
     private MulticastSocket getNewMulticastSocket() throws IOException {
         final MulticastSocket ssdpSocket = new MulticastSocket();
         ssdpSocket.setReuseAddress(true);
-        // TODO: get dynamically from local OS
         final NetworkInterface ni = NetworkInterface.getByInetAddress(InetAddress.getByName(this.simulatorHost));
         if (ni == null) {
             throw new IOException("Could not get network interface");
@@ -109,7 +115,7 @@ public class HueBridgeUpnpSimulator {
     }
 
     /**
-     * Send a batch of messages according to the way the Hue Bridge does it.
+     * Send a batch of messages according to the way the Hue bridge does it.
      * The batch consists of two times message1, two times message 2 and two times message 3
      * in rapid succession.
      *
