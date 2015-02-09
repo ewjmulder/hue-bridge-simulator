@@ -5,33 +5,7 @@ import java.awt.Color;
 /**
  * JSON DTO modeling the data for a Hue light.
  *
- *
- * "state": {
- *
- * "on": true,
- * "bri": 219,
- * "hue": 33849,
- * "sat": 44,
- * "xy":
- *
- * [
- * 0.3693,
- * 0.3695
- * ],
- * "ct": 234,
- * "alert": "none",
- * "effect": "none",
- * "colormode": "xy",
- * "reachable": true
- *
- * },
- * "type": "Extended color light",
- * "name": "Box",
- * "modelid": "LCT001",
- * "uniqueid": "00:17:88:01:00:e1:16:9e-0b",
- * "swversion": "66013452",
- *
- * }
+ * TODO: Line by line JSON comparason of output with real Hue Light
  */
 public class SimHueLight {
 
