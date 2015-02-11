@@ -26,8 +26,6 @@ public class SimHueBridge {
     }
 
     public void switchLight(final int index, final boolean on) {
-        // Do we care if it is on or off?
-        // TODO: refactoring around index and menu item selection (index in menu item DTO?)
-        this.menu.menuItemSelected(this.menu.getCurrentMenu()[index - 1]);
+        this.menu.menuItemClicked(this.menu.getCurrentMenu()[index - 1].getName(), on);
     }
 }

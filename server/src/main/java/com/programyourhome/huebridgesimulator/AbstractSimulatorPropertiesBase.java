@@ -1,9 +1,7 @@
 package com.programyourhome.huebridgesimulator;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 
-@PropertySource("classpath:com/programyourhome/huebridgesimulator/config/properties/simulator.properties")
 public abstract class AbstractSimulatorPropertiesBase {
 
     @Value("${simulator.host}")

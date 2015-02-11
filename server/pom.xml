@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>huebridgesimulator-rest-api</artifactId>
+            <artifactId>rest-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         

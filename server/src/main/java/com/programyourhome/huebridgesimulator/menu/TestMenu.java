@@ -2,52 +2,41 @@ package com.programyourhome.huebridgesimulator.menu;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import com.programyourhome.huebridgesimulator.model.menu.Menu;
 import com.programyourhome.huebridgesimulator.model.menu.MenuItem;
 import com.programyourhome.huebridgesimulator.model.menu.SimColor;
 
-//@Component
-//TODO: ConditionalOnProperty
+@Component
+@ConditionalOnProperty("backend.mode.test")
 public class TestMenu implements Menu {
 
-    private class Node extends MenuItem {
-        private Node nextNode;
-        private Node previousNode;
-
-        public Node(final String name, final Color color) {
-            super(name, new SimColor(color), false);
-        }
-
-    }
-
-    private int currentIndex;
-    private final List<Node> nodes;
+    private final List<MenuItem> menuItems;
 
     public TestMenu() {
-        this.currentIndex = 0;
-        this.nodes = new ArrayList<>();
-        this.nodes.add(new Node("Node 1", Color.RED));
-        this.nodes.add(new Node("Node 2", Color.RED));
-        this.nodes.add(new Node("Node 3", Color.RED));
-        this.nodes.add(new Node("Node 4", Color.RED));
+        this.menuItems = new ArrayList<>();
+        this.menuItems.add(new MenuItem("Item 1"));
+        this.menuItems.add(new MenuItem("Item 2"));
+        this.menuItems.add(new MenuItem("Item 3"));
+        this.menuItems.add(new MenuItem("Reverse", false, new SimColor(Color.RED)));
     }
 
     @Override
     public MenuItem[] getCurrentMenu() {
-        final List<MenuItem> menu = new ArrayList<>();
-        menu.add(this.nodes.get(this.currentIndex));
-        menu.add(new Node("Back", Color.WHITE));
-        return menu.toArray(new MenuItem[0]);
+        return this.menuItems.toArray(new MenuItem[0]);
     }
 
     @Override
-    public void menuItemSelected(final MenuItem menuItem) {
-        if (menuItem.getName().equals("Back") && this.currentIndex > 0) {
-            this.currentIndex--;
-        } else if (this.currentIndex < this.nodes.size() - 1) {
-            this.currentIndex++;
+    public void menuItemClicked(final String menuItemName, final boolean on) {
+        if (menuItemName.startsWith("Item")) {
+            this.getMenuItemByName(menuItemName).setOn(on);
+        } else {
+            Collections.swap(this.menuItems, 0, 2);
         }
     }
 

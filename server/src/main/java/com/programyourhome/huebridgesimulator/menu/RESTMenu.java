@@ -1,7 +1,7 @@
 package com.programyourhome.huebridgesimulator.menu;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,17 +9,16 @@ import com.programyourhome.huebridgesimulator.model.menu.Menu;
 import com.programyourhome.huebridgesimulator.model.menu.MenuItem;
 
 @Component
-@PropertySource("classpath:com/programyourhome/huebridgesimulator/config/properties/simulator.properties")
-// TODO: ConditionalOnProperty backend.mode
+@ConditionalOnProperty("backend.mode.rest")
 public class RESTMenu implements Menu {
 
-    @Value("${backend.host}")
+    @Value("${backend.rest.host}")
     private String backendHost;
 
-    @Value("${backend.port}")
+    @Value("${backend.rest.port}")
     private int backendPort;
 
-    @Value("${backend.basePath}")
+    @Value("${backend.rest.basePath}")
     private String backendBasePath;
 
     private final RestTemplate restTemplate;
@@ -34,16 +33,16 @@ public class RESTMenu implements Menu {
     }
 
     @Override
-    public void menuItemSelected(final MenuItem menuItem) {
-        this.restTemplate.put(this.buildBackendUrlMenuItemSelected(menuItem.getName()), null);
+    public void menuItemClicked(final String menuItemName, final boolean on) {
+        this.restTemplate.put(this.buildBackendUrlMenuItemSelected(menuItemName, on), null);
     }
 
     private String buildBackendUrlCurrentMenu() {
         return this.buildBackendBaseUrl() + "currentMenu";
     }
 
-    private String buildBackendUrlMenuItemSelected(final String name) {
-        return this.buildBackendBaseUrl() + "menuItemSelected/" + name;
+    private String buildBackendUrlMenuItemSelected(final String name, final boolean on) {
+        return this.buildBackendBaseUrl() + "menuItemClicked/" + name + "/" + on;
     }
 
     private String buildBackendBaseUrl() {
