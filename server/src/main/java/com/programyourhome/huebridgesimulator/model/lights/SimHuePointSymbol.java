@@ -1,5 +1,9 @@
 package com.programyourhome.huebridgesimulator.model.lights;
 
+/**
+ * JSON DTO modeling the data for a hue point symbol.
+ * Seems not to contain anything interesting, but is here for completeness of the simulation.
+ */
 public class SimHuePointSymbol {
 
     public String get1() {

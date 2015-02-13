@@ -2,6 +2,11 @@ package com.programyourhome.huebridgesimulator.model.menu;
 
 import java.awt.Color;
 
+/**
+ * Very basic DTO for an RGB color, containing just three numbers for red, green and blue.
+ * This implementation is useful because it's very easy to JSON (de)serialize.
+ * You can go to and from a java.awt.Color object using the methods in this class.
+ */
 public class SimColor {
 
     private int red;

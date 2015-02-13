@@ -2,6 +2,10 @@ package com.programyourhome.huebridgesimulator;
 
 import org.springframework.beans.factory.annotation.Value;
 
+/**
+ * Base class for classes that use the host, port and mac properties.
+ * These are needed to broadcast and supply the configured values for connecting to the hue bridge simulator.
+ */
 public abstract class AbstractSimulatorPropertiesBase {
 
     @Value("${simulator.host}")

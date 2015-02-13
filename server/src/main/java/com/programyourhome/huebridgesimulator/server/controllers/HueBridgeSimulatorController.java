@@ -28,12 +28,21 @@ import com.programyourhome.huebridgesimulator.model.connection.DeletedSuccesfull
 import com.programyourhome.huebridgesimulator.model.connection.ErrorMessage;
 import com.programyourhome.huebridgesimulator.model.connection.ErrorType;
 import com.programyourhome.huebridgesimulator.model.connection.HueBridgeResponse;
+import com.programyourhome.huebridgesimulator.model.connection.SetLightSuccesfully;
 import com.programyourhome.huebridgesimulator.model.connection.User;
 import com.programyourhome.huebridgesimulator.model.connection.UserActivity;
 import com.programyourhome.huebridgesimulator.model.connection.UserLookup;
+import com.programyourhome.huebridgesimulator.model.lights.GetLightsResponse;
 import com.programyourhome.huebridgesimulator.model.lights.SimHueLightState;
 import com.programyourhome.huebridgesimulator.proxy.SimHueBridge;
 
+/**
+ * This class simulates a hue bridge REST service. It responds to a subset of the URL's from the actual Philips Hue bridge.
+ * A minimal set of supported operations is available to allow users to connect/disconnect and to provide light data and
+ * respond to light switches. Furthermore it provides the description.xml that is referenced from the UPnP messages.
+ *
+ * This class could be extended to provide additional support for equivalent actual Philips Hue bridge functionality.
+ */
 @RestController
 public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBase {
 
@@ -48,6 +57,13 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         this.userActivity = new TreeMap<>();
     }
 
+    /**
+     * Provide the description.xml file as is done by the actual Philips Hue bridge. The only differences are
+     * the host, port and mac of the bridge to connect to. Also the name in the file has the suffix 'simulator'.
+     *
+     * @return the description.xml file as a String
+     * @throws IOException when the file could not be found on the classpath
+     */
     @RequestMapping(value = "description.xml", method = RequestMethod.GET)
     public String getDescription() throws IOException {
         this.logUserActivity(null, ActivityType.GET_DESCRIPTION);
@@ -59,7 +75,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     }
 
     /**
-     * Special variant of posting on /api with mime type 'application/x-www-form-urlencoded'. This is needed, because
+     * Special variant of posting a connect with mime type 'application/x-www-form-urlencoded'. This is needed, because
      * otherwise JSON deserialization will trip over de URL encoded characters. This method will perform the URL decoding and
      * then forward the JSON string to the connect method with the 'proper' mime type.
      *
@@ -72,8 +88,8 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     }
 
     /**
-     * Processes a post on /api to connect a new user to the bridge. The user and it's device type will be saved in an internal
-     * collection of users.
+     * Processes a post to connect a new user to the bridge. The user and it's device type will be saved in an internal
+     * collection of connected users.
      *
      * @param connectionRequest a JSON connection request
      * @return a 'connected succesfully' result
@@ -87,8 +103,16 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         return new ConnectedSuccesfully(username);
     }
 
+    /**
+     * Processes a post to disconnect a user to the bridge. The provided {usernameToDelete} will be
+     * removed from the list of connected users.
+     *
+     * @param username
+     * @param usernameToDelete
+     * @return
+     */
     @RequestMapping(value = "api/{username}/config/whitelist/{usernameToDelete}", method = RequestMethod.DELETE)
-    public HueBridgeResponse connect(@PathVariable("username") final String username, @PathVariable("usernameToDelete") final String usernameToDelete) {
+    public HueBridgeResponse disconnect(@PathVariable("username") final String username, @PathVariable("usernameToDelete") final String usernameToDelete) {
         final UserLookup userLookup = this.lookupUser(username);
         return this.executeOrError(userLookup, () -> {
             this.connectedUsers.remove(usernameToDelete);
@@ -97,38 +121,82 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         });
     }
 
+    /**
+     * Get the data about all the lights that are (currently) available on this bridge.
+     *
+     * @param username the connected username
+     * @return all light data or an error if the username is not a connected user
+     */
     @RequestMapping(value = "api/{username}/lights", method = RequestMethod.GET)
     public HueBridgeResponse getLights(@PathVariable("username") final String username) {
-        // TODO: re-enable when the server is more stable (or save/load users?)
-        // final User user = this.assertUserConnected(username);
-        // this.logUserActivity(user, ActivityType.GET_LIGHTS);
-        return this.hueBridge.getLights();
+        final UserLookup userLookup = this.lookupUser(username);
+        return this.executeOrError(userLookup, () -> {
+            this.logUserActivity(userLookup.getUser(), ActivityType.GET_LIGHTS);
+            return new GetLightsResponse(this.hueBridge.getLights());
+        });
     }
 
+    /**
+     * Special variant of putting a set light with mime type 'application/x-www-form-urlencoded'. This is needed, because
+     * otherwise JSON deserialization will trip over de URL encoded characters. This method will perform the URL decoding and
+     * then forward the JSON string to the connect method with the 'proper' mime type.
+     *
+     * @see setLight for further details
+     */
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/x-www-form-urlencoded")
-    public void setLight(@RequestBody final String stateUrlEncoded, @PathVariable("index") final int index) throws IOException {
+    public HueBridgeResponse setLight(@RequestBody final String stateUrlEncoded, @PathVariable("username") final String username,
+            @PathVariable("index") final int index)
+                    throws IOException {
         final String stateString = UriUtils.decode(stateUrlEncoded, "UTF8");
-        this.setLight(new ObjectMapper().readValue(stateString, SimHueLightState.class), index);
+        return this.setLight(new ObjectMapper().readValue(stateString, SimHueLightState.class), username, index);
     }
 
+    /**
+     * Set the state of a specific light to on or off. The new state of the light is put
+     * as a JSON object of type SimHueLightState. Only the 'on' property is used in this method.
+     *
+     * @param state the new state of the light
+     * @param username the connected username
+     * @param index the index of the light
+     * @return void or an error if the username is not a connected user
+     */
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/json")
-    public void setLight(@RequestBody final SimHueLightState state, @PathVariable("index") final int index) {
-        // TODO: re-enable when the server is more stable (or save/load users?)
-        // final User user = this.assertUserConnected(username);
-        // this.logUserActivity(user, ActivityType.SET_LIGHT);
-        this.hueBridge.switchLight(index, state.isOn());
+    public HueBridgeResponse setLight(@RequestBody final SimHueLightState state, @PathVariable("username") final String username,
+            @PathVariable("index") final int index) {
+        final UserLookup userLookup = this.lookupUser(username);
+        return this.executeOrError(userLookup, () -> {
+            this.logUserActivity(userLookup.getUser(), ActivityType.SET_LIGHT);
+            this.hueBridge.switchLight(index, state.isOn());
+            return new SetLightSuccesfully(index, state.isOn());
+        });
     }
 
+    /**
+     * Meta information about the simulated brigde: get a list of connected users.
+     *
+     * @return the list of connected users
+     */
     @RequestMapping(value = "simulation/connectedUsers", method = RequestMethod.GET)
     public Collection<User> getConnectedUsers() {
         return this.connectedUsers.values();
     }
 
+    /**
+     * Meta information about the simulated brigde: get a log list of all user activity.
+     *
+     * @return the list of all user activity that was logged
+     */
     @RequestMapping(value = "simulation/log", method = RequestMethod.GET)
     public Map<LocalDateTime, UserActivity> getLog() {
         return this.userActivity;
     }
 
+    /**
+     * Define the username to use. This will be either the supplied username or a randomly generated one.
+     *
+     * @param connectionRequest the connected request
+     * @return the username that was defined
+     */
     private String defineUsername(final ConnectionRequest connectionRequest) {
         final String username;
         if (connectionRequest.getUsername() != null) {
@@ -139,31 +207,60 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         return username;
     }
 
+    /**
+     * Execute the supplied action and return the result of the supplier if the user lookup succeeded
+     * or return an error if the user lookup failed.
+     *
+     * @param lookupUser the user lookup result
+     * @param supplier the supplier of the result, to be called if the user lookup succeeded
+     * @return the response
+     */
     private HueBridgeResponse executeOrError(final UserLookup lookupUser, final Supplier<HueBridgeResponse> supplier) {
         final HueBridgeResponse response;
         if (lookupUser.hasError()) {
             response = lookupUser.getError();
+            this.logUserActivity(null, ActivityType.ERROR, lookupUser.getError().toString());
         } else {
             response = supplier.get();
         }
         return response;
     }
 
+    /**
+     * Loopup the user with the provided username. This is presented as a lookup result that contains either
+     * the user or an error that occured during lookup.
+     *
+     * @param username the username
+     * @return the user lookup result
+     */
     private UserLookup lookupUser(final String username) {
         final User user = this.connectedUsers.get(username);
         final HueBridgeResponse error;
         if (user == null) {
-            error = new ErrorMessage(ErrorType.USER_NOT_CONNECTED, "/api", "User: '" + username + "' is not connected to the bridge.");
+            error = new ErrorMessage(ErrorType.USER_NOT_CONNECTED, "/api/...", "User: '" + username + "' is not connected to the bridge.");
         } else {
             error = null;
         }
         return new UserLookup(user, error);
     }
 
+    /**
+     * Log the user activity in an internal collection.
+     *
+     * @param user the user
+     * @param activityType the type
+     */
     private void logUserActivity(final User user, final ActivityType activityType) {
         this.logUserActivity(user, activityType, null);
     }
 
+    /**
+     * Log the user activity in an internal collection.
+     *
+     * @param user the user
+     * @param activityType the type
+     * @param data the data involved
+     */
     private void logUserActivity(final User user, final ActivityType activityType, final String data) {
         this.userActivity.put(LocalDateTime.now(), new UserActivity(user, activityType, data));
     }

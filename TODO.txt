@@ -1,3 +1,5 @@
 X Merge all modules into 1? Not really any advantage in making it so split up.
 - Listen to and respond to M-SEARCH
 X Replace ip/port/mac in description.xml at runtime instead of buildtime
+- Logging instead of sysouts and e.printStackTrace()
+- Add unit tests

@@ -1,5 +1,8 @@
 package com.programyourhome.huebridgesimulator.model.connection;
 
+/**
+ * Type of error encountered.
+ */
 public enum ErrorType {
 
     USER_NOT_CONNECTED(101);

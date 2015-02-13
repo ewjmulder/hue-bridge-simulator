@@ -1,6 +1,8 @@
 package com.programyourhome.huebridgesimulator.model.connection;
 
-
+/**
+ * DTO for the result of a user lookup. Contains either a user or an error.
+ */
 public class UserLookup {
 
     private final User user;

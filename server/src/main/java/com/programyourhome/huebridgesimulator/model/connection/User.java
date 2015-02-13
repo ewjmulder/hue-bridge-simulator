@@ -1,5 +1,8 @@
 package com.programyourhome.huebridgesimulator.model.connection;
 
+/**
+ * Simple DTO for keeping track of data about users.
+ */
 public class User {
 
     private final String username;

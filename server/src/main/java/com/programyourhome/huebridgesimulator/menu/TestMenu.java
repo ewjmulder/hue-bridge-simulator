@@ -12,6 +12,9 @@ import com.programyourhome.huebridgesimulator.model.menu.Menu;
 import com.programyourhome.huebridgesimulator.model.menu.MenuItem;
 import com.programyourhome.huebridgesimulator.model.menu.SimColor;
 
+/**
+ * A simple test menu to see if the hue bridge simulator 'lights' are correctly picked up by the device that you want to 'fool'.
+ */
 @Component
 @ConditionalOnProperty("backend.mode.test")
 public class TestMenu implements Menu {

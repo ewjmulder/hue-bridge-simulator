@@ -8,6 +8,10 @@ import org.springframework.web.client.RestTemplate;
 import com.programyourhome.huebridgesimulator.model.menu.Menu;
 import com.programyourhome.huebridgesimulator.model.menu.MenuItem;
 
+/**
+ * A Menu implementation that forwards the menu method calls to another REST server.
+ * Mainly meant to connect the hue bridge simulator to the program your home server.
+ */
 @Component
 @ConditionalOnProperty("backend.mode.rest")
 public class RESTMenu implements Menu {

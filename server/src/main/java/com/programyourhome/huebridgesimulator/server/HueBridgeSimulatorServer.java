@@ -7,6 +7,9 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.programyourhome.huebridgesimulator.ComponentScanBase;
 
+/**
+ * The main Spring Boot entry point. Contains annotations about component scan, configuration and property location.
+ */
 @ComponentScan(basePackageClasses = ComponentScanBase.class)
 @EnableAutoConfiguration
 @PropertySource("classpath:com/programyourhome/huebridgesimulator/config/properties/simulator.properties")

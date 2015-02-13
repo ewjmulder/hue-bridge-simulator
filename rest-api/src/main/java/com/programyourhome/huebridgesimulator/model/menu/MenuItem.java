@@ -1,5 +1,8 @@
 package com.programyourhome.huebridgesimulator.model.menu;
 
+/**
+ * DTO for a menu item. It contains a name, a state (on/off) and a color.
+ */
 public class MenuItem {
 
     private String name;

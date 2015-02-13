@@ -4,6 +4,10 @@ import java.awt.Color;
 
 import com.programyourhome.huebridgesimulator.model.lights.philips.PHUtilities;
 
+/**
+ * JSON DTO modeling the data for a hue light state.
+ * Contains constructor arguments for interesting fields to simulate, the rest is defaulted to sensible values.
+ */
 public class SimHueLightState {
 
     private boolean on;
@@ -32,6 +36,8 @@ public class SimHueLightState {
             this.xy = new float[] { 0.0f, 0.0f };
         }
         this.ct = 500;
+        this.alert = "none";
+        this.effect = "none";
         this.colormode = "xy";
         this.reachable = true;
     }

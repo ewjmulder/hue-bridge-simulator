@@ -3,9 +3,8 @@ package com.programyourhome.huebridgesimulator.model.lights;
 import java.awt.Color;
 
 /**
- * JSON DTO modeling the data for a Hue light.
- *
- * TODO: Line by line JSON comparason of output with real Hue Light
+ * JSON DTO modeling the data for a hue light.
+ * Contains constructor arguments for interesting fields to simulate, the rest is defaulted to sensible values.
  */
 public class SimHueLight {
 
@@ -22,7 +21,9 @@ public class SimHueLight {
         this.type = "Extended color light";
         this.name = name;
         this.modelid = "LCT001";
-        this.uniqueid = "01:23:45:67:89:00:00:00-0" + index;
+        // Pad with index of length 2, e.g. '01' or '34'. This limits the maximum number of simulated lights to 99, if a
+        // unique id with the right length is required.
+        this.uniqueid = "01:23:45:67:89:00:00:00-" + String.format("%02d", index);
         this.swversion = "66013452";
         this.pointsymbol = new SimHuePointSymbol();
     }

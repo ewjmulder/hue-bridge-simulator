@@ -6,6 +6,7 @@ import com.programyourhome.huebridgesimulator.model.connection.ConnectedSuccesfu
 
 /**
  * JSON DTO for the api response of connecting a new user.
+ * The ArrayList<Wrapper> construct is needed to create the right type of JSON output, namely an array with one item.
  */
 public class ConnectedSuccesfully extends ArrayList<Wrapper> implements HueBridgeResponse {
 
@@ -17,7 +18,7 @@ public class ConnectedSuccesfully extends ArrayList<Wrapper> implements HueBridg
 
     public class Wrapper {
 
-        private Username success;
+        private final Username success;
 
         public Wrapper(final String username) {
             this.success = new Username();
@@ -26,10 +27,6 @@ public class ConnectedSuccesfully extends ArrayList<Wrapper> implements HueBridg
 
         public Username getSuccess() {
             return this.success;
-        }
-
-        public void setSuccess(final Username success) {
-            this.success = success;
         }
 
         public class Username {

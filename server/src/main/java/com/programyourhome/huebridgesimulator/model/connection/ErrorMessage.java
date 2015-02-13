@@ -1,5 +1,8 @@
 package com.programyourhome.huebridgesimulator.model.connection;
 
+/**
+ * JSON DTO for a hue bridge error message, according to the spec from the Philips website.
+ */
 public class ErrorMessage implements HueBridgeResponse {
 
     private final Error error;
@@ -9,6 +12,15 @@ public class ErrorMessage implements HueBridgeResponse {
         this.error.type = type.getCode();
         this.error.address = address;
         this.error.description = description;
+    }
+
+    public Error getError() {
+        return this.error;
+    }
+
+    @Override
+    public String toString() {
+        return this.error.toString();
     }
 
     public class Error {
@@ -26,6 +38,11 @@ public class ErrorMessage implements HueBridgeResponse {
 
         public String getDescription() {
             return this.description;
+        }
+
+        @Override
+        public String toString() {
+            return "type: " + this.type + ", address: " + this.address + ", description: " + this.description;
         }
     }
 }

@@ -1,13 +1,7 @@
 package com.programyourhome.huebridgesimulator.model.lights.philips;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * Decompiled from Philips Hue SDK resources, to be able to run without the jar dependency.
@@ -63,13 +57,13 @@ public class PHUtilities
 
         final float r = (red > 0.04045F) ? (float) Math.pow((red + 0.055F) /
                 1.055F, 2.400000095367432D) :
-                    red / 12.92F;
+                red / 12.92F;
         final float g = (green > 0.04045F) ? (float) Math.pow((green + 0.055F) /
                 1.055F, 2.400000095367432D) :
-                    green / 12.92F;
+                green / 12.92F;
         final float b = (blue > 0.04045F) ? (float) Math.pow((blue + 0.055F) /
                 1.055F, 2.400000095367432D) :
-                    blue / 12.92F;
+                blue / 12.92F;
 
         final float x = r * 0.649926F + g * 0.103455F + b * 0.197109F;
         final float y = r * 0.234327F + g * 0.743075F + b * 0.022598F;
@@ -117,9 +111,14 @@ public class PHUtilities
             xy[1] = closestPoint.y;
         }
 
-        xy[0] = PHHueHelper.precision(xy[0]);
-        xy[1] = PHHueHelper.precision(xy[1]);
+        xy[0] = precision(xy[0]);
+        xy[1] = precision(xy[1]);
         return xy;
+    }
+
+    public static float precision(final float d)
+    {
+        return (Math.round(10000.0F * d) / 10000.0F);
     }
 
     public static float[] calculateXYFromRGB(final int red, final int green, final int blue, final String model)
@@ -200,41 +199,4 @@ public class PHUtilities
         return newPoint;
     }
 
-    public static Date stringToDate(final String dateString, final String timeZone)
-    {
-        final DateFormat dateFormate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", new Locale("nl_NL"));
-        dateFormate.setTimeZone(TimeZone.getTimeZone(timeZone));
-
-        Date date = null;
-        try {
-            date = dateFormate.parse(dateString);
-        } catch (final ParseException e) {
-            return null;
-        }
-        return date;
-    }
-
-    public static Date stringToDateForTime(final String dateString)
-    {
-        final DateFormat dateFormate = new SimpleDateFormat("HH:mm:ss", new Locale("nl_NL"));
-        dateFormate.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        Date date = null;
-        try {
-            date = dateFormate.parse(dateString);
-        } catch (final ParseException e) {
-            return null;
-        }
-        return date;
-    }
-
-    public static int dpToPx(final int dpi, final double dp)
-    {
-        return (int) Math.round(dp * dpi / 160);
-    }
-
-    public static double pxToDp(final int dpi, final int px)
-    {
-        return (px / dpi / 160);
-    }
 }

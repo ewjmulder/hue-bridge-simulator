@@ -1,5 +1,8 @@
 package com.programyourhome.huebridgesimulator.model.connection;
 
+/**
+ * One 'event' of user activity, consisting of the user involved, the type of activity and, optionally, the data provided.
+ */
 public class UserActivity {
 
     private final User user;
