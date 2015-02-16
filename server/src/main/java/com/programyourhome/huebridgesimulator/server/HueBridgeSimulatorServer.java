@@ -1,5 +1,7 @@
 package com.programyourhome.huebridgesimulator.server;
 
+import java.io.File;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,10 +14,23 @@ import com.programyourhome.huebridgesimulator.ComponentScanBase;
  */
 @ComponentScan(basePackageClasses = ComponentScanBase.class)
 @EnableAutoConfiguration
-@PropertySource("classpath:com/programyourhome/huebridgesimulator/config/properties/simulator.properties")
+@PropertySource("file:${simulator.properties.location}")
 public class HueBridgeSimulatorServer {
 
     public static void startServer() {
+        final String usageMessage = "Please provide the correct path to the simulator property location with: -Dsimulator.properties.location=/path/to/file";
+        final String simulatorPropertyLocation = System.getProperty("simulator.properties.location");
+        if (simulatorPropertyLocation == null) {
+            System.out.println("No value provided for property 'simulator.properties.location'.");
+            System.out.println(usageMessage);
+            System.exit(-1);
+        }
+        final File propertiesFile = new File(simulatorPropertyLocation);
+        if (!propertiesFile.exists()) {
+            System.out.println("Property file not found: '" + simulatorPropertyLocation + "'.");
+            System.out.println(usageMessage);
+            System.exit(-1);
+        }
         SpringApplication.run(HueBridgeSimulatorServer.class, new String[0]);
     }
 

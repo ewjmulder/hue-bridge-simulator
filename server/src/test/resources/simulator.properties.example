@@ -1,0 +1,42 @@
+##########################################################################
+#                  HUE BRIDGE SIMULATOR PROPERTIES                       #
+##########################################################################
+# Section 1: simulator server properties.                                #
+##########################################################################
+
+# The host where the hue bridge simulator is running.
+simulator.host          = 192.168.2.xxx
+# The port to use for the hue bridge simulator.
+simulator.port          = 65535
+# The MAC address* to use for the hue bridge simulator.
+simulator.mac           = 1234567890ab
+
+##########################################################################
+# Section 2: backend connection properties.                              #
+##########################################################################
+
+# Whether the backend mode test should be used.
+backend.mode.test       = true
+# Whether the backend mode REST should be used.
+backend.mode.rest       = false
+
+# Backend mode REST specific parameter: host where the REST server is running.
+backend.rest.host       = localhost
+# Backend mode REST specific parameter: port on which to connect to the REST server.
+backend.rest.port       = 3737
+# Backend mode REST specific parameter: base path to prepend to the menu URL's on to the REST server.
+backend.rest.basePath   = huebridgesimulator
+
+##########################################################################
+# Section 3: Spring Boot properties derived from the properties above.   #
+##########################################################################
+
+# The address on which Spring Boot is listening should be the same as the simulator host.
+server.address 			= ${simulator.host}
+# The port on which Spring Boot is listening should be the same as the simulator port.
+server.port 			= ${simulator.port}
+
+
+# * This can be any made up MAC, you might like to use HEX speak for fun.
+#   - http://en.wikipedia.org/wiki/Hexspeak
+#   - https://reminiscential.wordpress.com/2008/09/03/hexspeak-word-list/)
