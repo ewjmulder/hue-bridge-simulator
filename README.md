@@ -64,7 +64,7 @@ URL | HTTP Method | Parameters | Data | Returns | Description
 --- | ----------- | ---------- | ---- | ------- | -----------
 /api | POST | | `devicetype`, optionally a `username` | the connected username | Connect a new user to the bridge
 /api/{username} /config/whitelist /{usernameToDelete} | DELETE | connected username, username to delete | | success message | Disconnect a user from the bridge
-api/{username} /lights | GET | connected username | | list of lights with all available properties |Get the list of lights
+api/{username} /lights | GET | connected username | | list of lights with all available properties | Get the list of lights
 api/{username} /lights/{index}/state | PUT | connected username, index/id of light to switch | `on` (true or false) | success message | Switch a light on or off
 simulation /connectedUsers | GET | | | list of connected users | Meta information about the bridge: lists the connected users
 simulation/log | GET | | | list all user actions | Meta information about the bridge: lists of all the user actions on the bridge
@@ -75,7 +75,10 @@ One of the available backend menu's is the REST backend. This means that for acq
 
 URL | HTTP Method | Parameters | Data | Returns | Description
 --- | ----------- | ---------- | ---- | ------- | -----------
-/api | POST | | `devicetype`, optionally a `username` | the connected username | Connect a new user to the bridge
+/currentMenu | GET | | | menu item data | Get the current menu items
+/menuItemClicked/{name}/{on} | PUT | name of the menu item, on (true or false) | | | Inform about a light switch event
+
+Note: the URL's in the table above should be prepended with the value of the property `backend.rest.basePath`.
 
 ###Properties###
 
