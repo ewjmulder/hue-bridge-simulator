@@ -35,16 +35,18 @@ Prerequisites:
 
 Basic installation steps:
 1. Clone the project in the folder of your choice and go into the created `hue-bridge-simulator` folder
-2. Copy the file `server/src/test/resources/simulator.properties.example` to a location of your choice, eg `/home/user/simulator.properties` or `C:/simulator.properties`
+2. Copy the file `server/src/test/resources/simulator.properties.example` to a location of your choicSe, eg `/home/user/simulator.properties` or `C:/simulator.properties`
 3. Edit the copy of the properties file and choose the right property values for your situation (see section Properties)
-4. In the folder 'hue-bridge-simulator' run
-   `mvn clean install`
-5. Go into the 'server' subfolder and run
-   `mvn java:exec -Dsimulator.properties.location="/home/user/simulator.properties"` (of course use the path applicable for your situation)
+4. In the folder 'hue-bridge-simulator' run `mvn clean install`
+5. Go into the 'server' subfolder and run `mvn java:exec -Dsimulator.properties.location="/home/user/simulator.properties"` (of course use the path applicable for your situation)
 
 ###Eneco Toon###
 
-This project was specifically designed and tested to work with the [Eneco Toon wall display - Philips Hue interface](https://www.eneco.nl/includes/eneco3/img/toonstatic/toon-hue/toon-device.png). Toon can connect to a Philips Hue bridge and let you control your lights on the touchscreen interface. This is a cool feature, but it would be even cooler to not just control your lights, but your whole home automation system from the Toon display! 
+This project was specifically designed and tested to work with the [Eneco Toon wall display - Philips Hue interface](https://www.eneco.nl/includes/eneco3/img/toonstatic/toon-hue/toon-device.png). Toon can connect to a Philips Hue bridge and let you control your lights on the touchscreen interface. This is a cool feature, but it would be even cooler to not just control your lights, but your whole home automation system from the Toon display!
+
+To be able to 'hook into' the interaction of Toon with a Philips Hue bridge we must simulate being a bridge ourselves, hence the project name hue-bridge-simulator.
+When you installed and started the software with the getting started steps outlined above, the simulator will announce itself on the local network (using UPnP).
+Toon will pick this up and allow you to connect to it. If you ...
 
 ##Technical information##
 
