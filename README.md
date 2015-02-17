@@ -52,7 +52,7 @@ This project is programmed in Java 8 and uses Maven as a build tool. It makes he
 
 ###UPnP traffic###
 
-The simulated bridge mimics the UPnP behavior from the Philips Hue bridge as closely as possible. This means: every minute 6 NOTIFY messages will be sent. Three different messages, each one sent twice. This behavior is based on sniffing the local network messages of a real Philips Hue bridge. The messages contain information about the Hue bridge device. Their content is exactly identical to the ones from an actual Philips Hue bridge, except for the 'LOCATION:' and 'uuid:' parts. See the `HueBridgeUpnpSimulator` class for more information. These NOTIFY messages are enough for the Toon to pick up this simulated bridge, so no further UPnP protocol functionality is implemented. This also means the simulated bridge will not respond to UPnP M-SEARCH queries. This might be added in the future.
+The simulated bridge mimics the UPnP behavior from the Philips Hue bridge as closely as possible. This means: every minute 6 NOTIFY messages will be sent. Three different messages, each one sent twice. This behavior is based on sniffing the local network messages of a real Philips Hue bridge. The messages contain information about the Hue bridge device. Their content is exactly identical to the ones from an actual Philips Hue bridge, except for the `LOCATION:` and `uuid:` parts. See the `HueBridgeUpnpSimulator` class for more information. These NOTIFY messages are enough for Toon to pick up this simulated bridge, so no further UPnP protocol functionality is implemented. This also means the simulated bridge will not respond to UPnP M-SEARCH queries. This might be added in the future.
 
 The simulated bridge will also serve the description.xml file that is referred to in the UPnP NOTIFY messages. The contents of this description.xml file does exactly match the one from the real Philips Hue bridge, except for the host, port and MAC address. Also the friendly name is appended with 'simulation'.
 
@@ -67,9 +67,9 @@ URL | HTTP Method | Parameters | Data | Returns | Description
 api/{username} /lights | GET | connected username | | list of lights with all available properties | Get the list of lights
 api/{username} /lights/{index}/state | PUT | connected username, index/id of light to switch | `on` (true or false) | success message | Switch a light on or off
 simulation /connectedUsers | GET | | | list of connected users | Meta information about the bridge: lists the connected users
-simulation/log | GET | | | list all user actions | Meta information about the bridge: lists of all the user actions on the bridge
+simulation/log | GET | | | list all user actions | Meta information about the bridge: list of all the user actions on the bridge
 
-###Rest backend API###
+###REST backend API###
 
 One of the available backend menu's is the REST backend. This means that for acquiring the lights data and for acting on a light switch, the bridge will contact another REST server. This can be the Program Your Home server, or any other REST server that supports the required URL's. The list below lists these URL's: (see the `RESTMenu` class for more details).
 
