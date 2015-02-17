@@ -39,7 +39,8 @@ public class TestMenu implements Menu {
         if (menuItemName.startsWith("Item")) {
             this.getMenuItemByName(menuItemName).setOn(on);
         } else {
-            Collections.swap(this.menuItems, 0, 2);
+            Collections.swap(this.menuItems, 0, 3);
+            Collections.swap(this.menuItems, 1, 2);
         }
     }
 

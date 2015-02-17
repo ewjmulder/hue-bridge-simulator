@@ -5,7 +5,7 @@
 ##########################################################################
 
 # The host where the hue bridge simulator is running.
-simulator.host          = 192.168.2.xxx
+simulator.host          = xxx.xxx.xxx.xxx
 # The port to use for the hue bridge simulator.
 simulator.port          = 65535
 # The MAC address* to use for the hue bridge simulator.
