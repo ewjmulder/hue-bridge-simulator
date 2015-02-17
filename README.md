@@ -63,10 +63,10 @@ The Simulated bridge API mimics the Philips Hue API, but only the subset that is
 URL | HTTP Method | Parameters | Data | Returns | Description
 --- | ----------- | ---------- | ---- | ------- | -----------
 /api | POST | | `devicetype`, optionally a `username` | the connected username | Connect a new user to the bridge
-/api/{username}/config/whitelist/{usernameToDelete} | DELETE | connected username, username to delete | | success message | Disconnect a user from the bridge
-api/{username}/lights | GET | connected username | | list of lights with all available properties |Get the list of lights
-api/{username}/lights/{index}/state | PUT | connected username, index/id of light to switch | `on` (true or false) | success message | Switch a light on or off
-simulation/connectedUsers | GET | | | list of connected users | Meta information about the bridge: lists the connected users
+/api/{username} /config/whitelist /{usernameToDelete} | DELETE | connected username, username to delete | | success message | Disconnect a user from the bridge
+api/{username} /lights | GET | connected username | | list of lights with all available properties |Get the list of lights
+api/{username} /lights/{index}/state | PUT | connected username, index/id of light to switch | `on` (true or false) | success message | Switch a light on or off
+simulation /connectedUsers | GET | | | list of connected users | Meta information about the bridge: lists the connected users
 simulation/log | GET | | | list all user actions | Meta information about the bridge: lists of all the user actions on the bridge
 
 ###Rest backend API###
