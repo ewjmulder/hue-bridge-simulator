@@ -61,7 +61,7 @@ The simulated bridge will also serve the description.xml file that is referred t
 The Simulated bridge API mimics the Philips Hue API, but only the subset that is needed for interaction with the Eneco Toon wall display. This means the following URL's are available: (see the `HueBridgeSimulatorController` class for details)
 
 URL | HTTP Method | Parameters | Data | Returns | Description
---- | ----------- | ---------- | ---- | -----------
+--- | ----------- | ---------- | ---- | ------- | -----------
 /api | POST | | `devicetype`, optionally a `username` | the connected username | Connect a new user to the bridge
 /api/{username}/config/whitelist/{usernameToDelete} | DELETE | connected username, username to delete | | success message | Disconnect a user from the bridge
 api/{username}/lights | GET | connected username | | list of lights with all available properties |Get the list of lights
@@ -74,7 +74,7 @@ simulation/log | GET | | | list all user actions | Meta information about the br
 One of the available backend menu's is the REST backend. This means that for acquiring the lights data and for acting on a light switch, the bridge will contact another REST server. This can be the Program Your Home server, or any other REST server that supports the required URL's. The list below lists these URL's: (see the `RESTMenu` class for more details).
 
 URL | HTTP Method | Parameters | Data | Returns | Description
---- | ----------- | ---------- | ---- | -----------
+--- | ----------- | ---------- | ---- | ------- | -----------
 /api | POST | | `devicetype`, optionally a `username` | the connected username | Connect a new user to the bridge
 
 ###Properties###
