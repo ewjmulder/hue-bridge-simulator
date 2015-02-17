@@ -80,6 +80,8 @@ URL | HTTP Method | Parameters | Data | Returns | Description
 
 Note: the URL's in the table above should be prepended with the value of the property `backend.rest.basePath`.
 
+The definition of a menu item is implemented in `com.programyourhome.huebridgesimulator.model.menu.MenuItem`. This will translate to JSON through the straightforward way of using one key/value member per Java property ([Jackson](https://github.com/FasterXML/jackson) default).
+
 ###Properties###
 
 The simulator.properties file needs to be edited to provide the right values for your situation. The available properties are listed in the example file, including a description of how to choose the right value. This section will provide a general idea of why these properties exist and how they take effect.
