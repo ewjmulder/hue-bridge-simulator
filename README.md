@@ -1,9 +1,9 @@
 ####Background####
-* Erik: "We'll expand our home automation system with Eneco Toon for heating control, including a cool touchscreen on the living room wall."
-* Erik's wife: "Very nice, so can we operate the whole home from there as well?"
-* Erik: "That would be super, but I guess you have to hack into the device to add your own custom interface and it seems no one has successfully done that yet."
-* Toon announcement: "We'll soon be adding control of your Philips Hue lights to Toon."
-* Erik: "Hmm, that will use local network communication with a known and documented protocol. This is my way in! :-)"
+- Erik: *"We'll expand our home automation system with Eneco Toon for heating control, including a cool touchscreen on the living room wall."*
+- Erik's wife: *"Very nice, so can we operate the whole home from there as well?"*
+- Erik: *"That would be super, but I guess you have to hack into the device to add your own custom interface and it seems no one has successfully done that yet."*
+- Toon announcement: *"We'll soon be adding control of your Philips Hue lights to Toon."*
+- Erik: *"Hmm, that will use local network communication with a known and documented protocol. **This is my way in! :-)**"*
 
 #Hue Bridge Simulator#
 
