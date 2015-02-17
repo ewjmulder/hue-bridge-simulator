@@ -1,9 +1,14 @@
 ####Background####
 * Erik:
+
 > quote 1
+
 * Erik's wife:
+
 > quote 2
+
 * Erik:
+
 > quote 3
 
 #Hue Bridge Simulator#
