@@ -25,6 +25,7 @@ Prerequisites:
 * Maven 3 installed and on the path (Maven 2 might also work)
 
 Basic installation steps:
+
 1. Clone the project in the folder of your choice and go into the created `hue-bridge-simulator` folder
 2. Copy the file `server/src/test/resources/simulator.properties.example` to a location of your choicSe, eg `/home/user/simulator.properties` or `C:/simulator.properties`
 3. Edit the copy of the properties file and choose the right property values for your situation (see section Properties)
