@@ -46,6 +46,15 @@ If you don't want to use the Program Your Home server, you can create your own R
 
 Enjoy controlling your smart home with the Toon tablet on your wall!
 
+##Known issues / limitations##
+
+- The software has only been tested at my home and might not work / work differently depending on your local situation. Please let me know if you have any issues.
+- The interface of Toon of course still 'thinks' it will turn on and off lights, so the UI is not ideal for controlling you smart home.
+- Do not use the Toon functionality to turn all lights on or off at the same time, unless you like the resulting effect.
+- Unfortunately Toon will 'remember' all light id's. So if you first have 4 menu items (lights) and later only 2, the other 2 will still be visible in the Toon interface.
+  - Workaround is to always display the same number of menu items, maybe some with the name 'unused' or so to indicate they are not applicable at the moment.
+  - If you 'messed up' the lights in the UI and would like to 'reset', disconnect and reconnect Toon to the bridge.
+
 ##Technical information##
 
 This project is programmed in Java 8 and uses Maven as a build tool. It makes heavy use of the [Spring framework](http://spring.io/). [Spring Boot](http://projects.spring.io/spring-boot/) is used to start a web container with minimal custom configuration. Spring MVC, and more specifically the @RestController annotation is used to easily set up some URL's that will be serving data according to the Philips Hue bridge API. For the UPnP part of the simulation, the classes in the java.net package are used to broadcast messages over the local network. See the source code and Javadoc for more details.
