@@ -103,4 +103,4 @@ Section 3 does not need any manual changes. It merely defines some derived prope
 
 ##License##
 
-This project, meaning all the source code, configuration and documentation, is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+This project, meaning all source code, configuration and documentation, is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
