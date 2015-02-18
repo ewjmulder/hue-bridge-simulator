@@ -100,3 +100,7 @@ Section 1 is about how the simulated bridge should be available on the network. 
 Section 2 is about how the simulated bridge will get the lights data and who it should inform when a light has been switched. This functionality combined is referred to as the backend and is called a 'Menu' and is represented by a class implementing the `com.programyourhome.huebridgesimulator.model.menu.Menu` interface. Currently, 2 Menu implementations exist: Test and REST. The Test menu is purely for testing if the simulated bridge is working correctly. The REST menu is meant to connect the simulated bridge to a REST backend. This could be the Program Your Home server, or any other server that supports the REST api for the lights menu. For the REST server, 3 more properties are available: host, port and base path.
 
 Section 3 does not need any manual changes. It merely defines some derived properties that supply Spring boot with configuration for the host and port to run on. This way you only have to configure that once, and the same values will be used both by Spring Boot and the simulated bridge software.
+
+##License##
+
+This project, meaning all the source code, configuration and documentation, is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
