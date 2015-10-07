@@ -3,7 +3,8 @@ package com.programyourhome.huebridgesimulator.proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Component;
 
 import com.programyourhome.huebridgesimulator.model.lights.SimHueLight;
@@ -18,7 +19,7 @@ import com.programyourhome.huebridgesimulator.model.menu.MenuItem;
 @Component
 public class SimHueBridge {
 
-    @Autowired
+    @Inject
     private Menu menu;
 
     /**

@@ -10,8 +10,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +47,7 @@ import com.programyourhome.huebridgesimulator.proxy.SimHueBridge;
 @RestController
 public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBase {
 
-    @Autowired
+    @Inject
     private SimHueBridge hueBridge;
 
     private final Map<String, User> connectedUsers;
