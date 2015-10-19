@@ -39,4 +39,4 @@ server.port 			= ${simulator.port}
 
 # * This can be any made up MAC, you might like to use HEX speak for fun.
 #   - http://en.wikipedia.org/wiki/Hexspeak
-#   - https://reminiscential.wordpress.com/2008/09/03/hexspeak-word-list/)
+#   - https://reminiscential.wordpress.com/2008/09/03/hexspeak-word-list/
