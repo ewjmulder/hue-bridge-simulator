@@ -146,8 +146,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      */
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/x-www-form-urlencoded")
     public HueBridgeResponse setLight(@RequestBody final String stateUrlEncoded, @PathVariable("username") final String username,
-            @PathVariable("index") final int index)
-                    throws IOException {
+            @PathVariable("index") final int index) throws IOException {
         final String stateString = UriUtils.decode(stateUrlEncoded, "UTF8");
         return this.setLight(new ObjectMapper().readValue(stateString, SimHueLightState.class), username, index);
     }
@@ -166,7 +165,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
             @PathVariable("index") final int index) {
         final UserLookup userLookup = this.lookupUser(username);
         return this.executeOrError(userLookup, () -> {
-            this.logUserActivity(userLookup.getUser(), ActivityType.SET_LIGHT);
+            this.logUserActivity(userLookup.getUser(), ActivityType.SET_LIGHT, index + " -> " + (state.isOn() ? "on" : "off"));
             this.hueBridge.switchLight(index, state.isOn());
             return new SetLightSuccesfully(index, state.isOn());
         });

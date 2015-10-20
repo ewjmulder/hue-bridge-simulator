@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.programyourhome.huebridgesimulator.model.lights.SimHueLight;
@@ -22,6 +23,9 @@ public class SimHueBridge {
     @Inject
     private Menu menu;
 
+    @Value("${simulator.prependIndex}")
+    private boolean prependIndex;
+
     /**
      * Get the menu items that should be available and wrap their data in simulated light DTO's.
      *
@@ -30,8 +34,19 @@ public class SimHueBridge {
     public Map<String, SimHueLight> getLights() {
         final Map<String, SimHueLight> lights = new HashMap<>();
         int index = 1;
-        for (final MenuItem menuItem : this.menu.getCurrentMenu()) {
-            lights.put("" + index, new SimHueLight(index, menuItem.getName(), menuItem.getColor().toAwtColor(), menuItem.isOn()));
+        final MenuItem[] currentMenu = this.menu.getCurrentMenu();
+        for (final MenuItem menuItem : currentMenu) {
+            String lightName = menuItem.getName();
+            if (this.prependIndex) {
+                String indexString = "" + index;
+                // If the total number of items is larger than or equal to 10, use 2 positions for the index
+                // to ensure lexicographical ordering.
+                if (currentMenu.length >= 10) {
+                    indexString = String.format("%02d", index);
+                }
+                lightName = indexString + ". " + lightName;
+            }
+            lights.put("" + index, new SimHueLight(index, lightName, menuItem.getColor().toAwtColor(), menuItem.isOn()));
             index++;
         }
         return lights;

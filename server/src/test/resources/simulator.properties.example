@@ -10,6 +10,9 @@ simulator.host          = xxx.xxx.xxx.xxx
 simulator.port          = 65535
 # The MAC address* to use for the hue bridge simulator.
 simulator.mac           = 1234567890ab
+# Whether or not to prepend all menu items with their index number. If set to true,
+# you'll be sure the menu items are displayed in order if the UI uses sort by name instead of index.
+simulator.prependIndex  = true
 
 ##########################################################################
 # Section 2: backend connection properties.                              #
