@@ -30,7 +30,7 @@ Basic installation steps:
 2. Copy the file `server/src/test/resources/simulator.properties.example` to a location of your choice, eg `/home/user/simulator.properties` or `C:/simulator.properties`
 3. Edit the copy of the properties file and choose the right property values for your situation (see comments in the properties file and the section Properties below)
 4. In the folder 'hue-bridge-simulator' run `mvn clean install`
-5. Go into the 'server' subfolder and run `mvn java:exec -Dsimulator.properties.location="/home/user/simulator.properties"` (of course use the path applicable for your situation)
+5. Go into the 'server' subfolder and run `mvn exec:java -Dsimulator.properties.location="/home/user/simulator.properties"` (of course use the path applicable for your situation)
 
 ###Eneco Toon###
 
