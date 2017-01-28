@@ -1,6 +1,7 @@
 package com.programyourhome.huebridgesimulator.server.controllers;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,12 +14,13 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.programyourhome.huebridgesimulator.AbstractSimulatorPropertiesBase;
@@ -34,6 +36,7 @@ import com.programyourhome.huebridgesimulator.model.connection.User;
 import com.programyourhome.huebridgesimulator.model.connection.UserActivity;
 import com.programyourhome.huebridgesimulator.model.connection.UserLookup;
 import com.programyourhome.huebridgesimulator.model.lights.GetLightsResponse;
+import com.programyourhome.huebridgesimulator.model.lights.SimHueLight;
 import com.programyourhome.huebridgesimulator.model.lights.SimHueLightState;
 import com.programyourhome.huebridgesimulator.proxy.SimHueBridge;
 
@@ -46,6 +49,8 @@ import com.programyourhome.huebridgesimulator.proxy.SimHueBridge;
  */
 @RestController
 public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBase {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     private SimHueBridge hueBridge;
@@ -67,6 +72,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      */
     @RequestMapping(value = "description.xml", method = RequestMethod.GET)
     public String getDescription() throws IOException {
+        this.log.debug("Request for description.xml");
         this.logUserActivity(null, ActivityType.GET_DESCRIPTION);
         final String descriptionString = IOUtils.toString(this.getClass().getResourceAsStream("/description.xml"));
         return descriptionString
@@ -84,8 +90,8 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      */
     @RequestMapping(value = "api", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded")
     public HueBridgeResponse connectUrlEncoded(@RequestBody final String connectionRequestUrlEncoded) throws IOException {
-        final String connectionRequestString = UriUtils.decode(connectionRequestUrlEncoded, "UTF8");
-        return this.connect(new ObjectMapper().readValue(connectionRequestString, ConnectionRequest.class));
+        this.log.debug("Request to connect (form wrapper)");
+        return this.connect(new ObjectMapper().readValue(this.urlDecode(connectionRequestUrlEncoded), ConnectionRequest.class));
     }
 
     /**
@@ -93,10 +99,11 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      * collection of connected users.
      *
      * @param connectionRequest a JSON connection request
-     * @return a 'connected succesfully' result
+     * @return a 'connected successfully' result
      */
     @RequestMapping(value = "api", method = RequestMethod.POST, consumes = "application/json")
     public HueBridgeResponse connect(@RequestBody final ConnectionRequest connectionRequest) {
+        this.log.debug("Request to connect");
         final String username = this.defineUsername(connectionRequest);
         final User user = new User(username, connectionRequest.getDevicetype());
         this.connectedUsers.put(username, user);
@@ -108,12 +115,13 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      * Processes a post to disconnect a user to the bridge. The provided {usernameToDelete} will be
      * removed from the list of connected users.
      *
-     * @param username
-     * @param usernameToDelete
+     * @param username the connected username
+     * @param usernameToDelete the username to detele
      * @return
      */
     @RequestMapping(value = "api/{username}/config/whitelist/{usernameToDelete}", method = RequestMethod.DELETE)
     public HueBridgeResponse disconnect(@PathVariable("username") final String username, @PathVariable("usernameToDelete") final String usernameToDelete) {
+        this.log.debug("Request to disconnect");
         final UserLookup userLookup = this.lookupUser(username);
         return this.executeOrError(userLookup, () -> {
             this.connectedUsers.remove(usernameToDelete);
@@ -130,10 +138,35 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      */
     @RequestMapping(value = "api/{username}/lights", method = RequestMethod.GET)
     public HueBridgeResponse getLights(@PathVariable("username") final String username) {
+        this.log.debug("Request for lights");
         final UserLookup userLookup = this.lookupUser(username);
         return this.executeOrError(userLookup, () -> {
             this.logUserActivity(userLookup.getUser(), ActivityType.GET_LIGHTS);
             return new GetLightsResponse(this.hueBridge.getLights());
+        });
+    }
+
+    /**
+     * Get the data about one specific light.
+     *
+     * @param username the connected username
+     * @param index the index of the light
+     * @return specific light data or an error if no such light or the username is not a connected user
+     */
+    @RequestMapping(value = "api/{username}/lights/{index}", method = RequestMethod.GET)
+    public HueBridgeResponse getLight(@PathVariable("username") final String username, @PathVariable("index") final int index) {
+        this.log.debug("Request for light " + index);
+        final UserLookup userLookup = this.lookupUser(username);
+        return this.executeOrError(userLookup, () -> {
+            this.logUserActivity(userLookup.getUser(), ActivityType.GET_LIGHTS);
+            Map<String, SimHueLight> lights = this.hueBridge.getLights();
+            HueBridgeResponse response;
+            if (lights.containsKey("" + index)) {
+                response = lights.get("" + index);
+            } else {
+                response = new ErrorMessage(ErrorType.RESOURCE_NOT_AVAILABLE, "/...", "resource not available");
+            }
+            return response;
         });
     }
 
@@ -147,8 +180,8 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/x-www-form-urlencoded")
     public HueBridgeResponse setLight(@RequestBody final String stateUrlEncoded, @PathVariable("username") final String username,
             @PathVariable("index") final int index) throws IOException {
-        final String stateString = UriUtils.decode(stateUrlEncoded, "UTF8");
-        return this.setLight(new ObjectMapper().readValue(stateString, SimHueLightState.class), username, index);
+        this.log.debug("Request to change the state of light " + index + " (form wrapper)");
+        return this.setLight(new ObjectMapper().readValue(this.urlDecode(stateUrlEncoded), SimHueLightState.class), username, index);
     }
 
     /**
@@ -163,6 +196,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/json")
     public HueBridgeResponse setLight(@RequestBody final SimHueLightState state, @PathVariable("username") final String username,
             @PathVariable("index") final int index) {
+        this.log.debug("Request to change the state of light " + index);
         final UserLookup userLookup = this.lookupUser(username);
         return this.executeOrError(userLookup, () -> {
             this.logUserActivity(userLookup.getUser(), ActivityType.SET_LIGHT, index + " -> " + (state.isOn() ? "on" : "off"));
@@ -237,11 +271,21 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         final User user = this.connectedUsers.get(username);
         final HueBridgeResponse error;
         if (user == null) {
-            error = new ErrorMessage(ErrorType.USER_NOT_CONNECTED, "/api/...", "User: '" + username + "' is not connected to the bridge.");
+            this.log.warn("Request from unautorized user: " + username);
+            error = new ErrorMessage(ErrorType.UNAUTHORIZED_USER, "/...", "unauthorized user");
         } else {
             error = null;
         }
         return new UserLookup(user, error);
+    }
+
+    private String urlDecode(final String input) throws IOException {
+        String output = URLDecoder.decode(input, "UTF8");
+        if (output.endsWith("=")) {
+            // Weird case of a trailing '=', that should be removed.
+            output = output.substring(0, output.length() - 1);
+        }
+        return output;
     }
 
     /**

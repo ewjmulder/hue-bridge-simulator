@@ -18,10 +18,12 @@ simulator.prependIndex  = true
 # Section 2: backend connection properties.                              #
 ##########################################################################
 
-# Whether the backend mode test should be used.
-backend.mode.test       = true
+# Whether the backend mode screen test should be used.
+backend.mode.test.screen   = true
+# Whether the backend mode voice test should be used.
+backend.mode.test.voice    = false
 # Whether the backend mode REST should be used.
-backend.mode.rest       = false
+backend.mode.rest          = false
 
 # Backend mode REST specific parameter: host where the REST server is running.
 backend.rest.host       = localhost
