@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -13,15 +15,17 @@ import com.programyourhome.huebridgesimulator.model.menu.MenuItem;
 import com.programyourhome.huebridgesimulator.model.menu.SimColor;
 
 /**
- * A simple test menu to see if the hue bridge simulator 'lights' are correctly picked up by the device that you want to 'fool'.
+ * A simple test menu to see if the hue bridge simulator 'lights' are correctly picked up by a screen based device that you want to 'fool'.
  */
 @Component
-@ConditionalOnProperty("backend.mode.test")
-public class TestMenu implements Menu {
+@ConditionalOnProperty("backend.mode.test.screen")
+public class ScreenTestMenu implements Menu {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final List<MenuItem> menuItems;
 
-    public TestMenu() {
+    public ScreenTestMenu() {
         this.menuItems = new ArrayList<>();
         this.menuItems.add(new MenuItem("Item 1"));
         this.menuItems.add(new MenuItem("Item 2"));
@@ -36,6 +40,7 @@ public class TestMenu implements Menu {
 
     @Override
     public void menuItemClicked(final String menuItemName, final boolean on) {
+        this.log.info("Menu item 'clicked': " + menuItemName);
         if (menuItemName.startsWith("Item")) {
             this.getMenuItemByName(menuItemName).setOn(on);
         } else {

@@ -2,11 +2,13 @@ package com.programyourhome.huebridgesimulator.model.lights;
 
 import java.awt.Color;
 
+import com.programyourhome.huebridgesimulator.model.connection.HueBridgeResponse;
+
 /**
  * JSON DTO modeling the data for a hue light.
  * Contains constructor arguments for interesting fields to simulate, the rest is defaulted to sensible values.
  */
-public class SimHueLight {
+public class SimHueLight implements HueBridgeResponse {
 
     private final SimHueLightState state;
     private final String type;
