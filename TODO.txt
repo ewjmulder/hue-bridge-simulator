@@ -1,5 +1,9 @@
 X Merge all modules into 1? Not really any advantage in making it so split up.
 X Replace ip/port/mac in description.xml at runtime instead of buildtime
-- Listen to and respond to M-SEARCH
+X Listen to and respond to M-SEARCH
 - Logging instead of sysouts and e.printStackTrace()
 - Add unit tests
+- Persist authorized users on disk!
+- Create hardware compatibility mode Toon/Alexa in properties to not let Alexa grab all Toon sim devices
+- Rename 'menu' stuff to more appropriate naming (taking a good look at all naming regarding new Alexa use)
+- Update README with more Alexa stuff
