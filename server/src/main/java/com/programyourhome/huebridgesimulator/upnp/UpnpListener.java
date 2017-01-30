@@ -52,7 +52,7 @@ public class UpnpListener extends AbstractUpnpHandler {
                 byte[] buffer = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 multicastSocket.receive(packet);
-                this.log.debug("Detected packet from " + packet.getAddress().getHostAddress());
+                this.log.trace("Detected packet from " + packet.getAddress().getHostAddress());
                 if (this.isSSDPDiscoveryPacket(packet)) {
                     this.log.info("Detected SSDP Discovery packet from " + packet.getAddress().getHostAddress());
                     try {

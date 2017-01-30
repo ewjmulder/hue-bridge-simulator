@@ -31,7 +31,15 @@ public class HueBridgeSimulatorServer {
             System.out.println(usageMessage);
             System.exit(-1);
         }
-        SpringApplication.run(HueBridgeSimulatorServer.class, new String[0]);
+        System.out.println("Using properties in file: " + propertiesFile.getAbsolutePath());
+
+        // Set the Spring config location file to the Program Your Home properties file, so it will pick up all
+        // Spring boot config from there as well. Note: this must be done like this instead of using a @PropertySource
+        // annotation, because otherwise the logging properties will not be picked up. They must be available
+        // very early in the boot process, see also: https://github.com/spring-projects/spring-boot/issues/2709
+        System.setProperty("spring.config.location", propertiesFile.toURI().toString());
+        final SpringApplication application = new SpringApplication(HueBridgeSimulatorServer.class);
+        application.run(new String[0]);
     }
 
 }
