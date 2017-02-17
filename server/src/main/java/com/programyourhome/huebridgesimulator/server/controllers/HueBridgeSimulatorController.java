@@ -2,6 +2,7 @@ package com.programyourhome.huebridgesimulator.server.controllers;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,7 +75,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     public String getDescription() throws IOException {
         this.log.debug("Request for description.xml");
         this.logUserActivity(null, ActivityType.GET_DESCRIPTION);
-        final String descriptionString = IOUtils.toString(this.getClass().getResourceAsStream("/description.xml"));
+        final String descriptionString = IOUtils.toString(this.getClass().getResourceAsStream("/description.xml"), Charset.forName("UTF-8"));
         return descriptionString
                 .replace("[HOST]", this.getSimulatorHost())
                 .replace("[PORT]", Integer.toString(this.getSimulatorPort()))
