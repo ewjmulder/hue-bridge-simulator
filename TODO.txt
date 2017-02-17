@@ -5,6 +5,6 @@ X Listen to and respond to M-SEARCH
 - Add unit tests
 - Persist authorized users on disk!
 - Create hardware compatibility mode Toon/Alexa in properties to not let Alexa grab all Toon sim devices
-- Rename 'menu' stuff to more appropriate naming (taking a good look at all naming regarding new Alexa use)
+X Rename 'menu' stuff to more appropriate naming (taking a good look at all naming regarding new Alexa use)
 - Update README with more Alexa stuff
 - Complete update of README for 2.0

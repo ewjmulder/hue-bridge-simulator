@@ -1,4 +1,4 @@
-package com.programyourhome.huebridgesimulator.model.menu;
+package com.programyourhome.huebridgesimulator.model;
 
 import java.awt.Color;
 
@@ -8,6 +8,10 @@ import java.awt.Color;
  * You can go to and from a java.awt.Color object using the methods in this class.
  */
 public class SimColor {
+
+    public static final SimColor RED = new SimColor(255, 0, 0);
+    public static final SimColor GREEN = new SimColor(0, 255, 0);
+    public static final SimColor BLUE = new SimColor(0, 0, 255);
 
     private int red;
     private int green;

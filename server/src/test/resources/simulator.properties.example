@@ -10,8 +10,10 @@ simulator.host          = xxx.xxx.xxx.xxx
 simulator.port          = 65535
 # The MAC address* to use for the hue bridge simulator.
 simulator.mac           = 1234567890ab
-# Whether or not to prepend all menu items with their index number. If set to true,
-# you'll be sure the menu items are displayed in order if the UI uses sort by name instead of index.
+# Whether or not to prepend all simulated lights with their index number. If set to true,
+# you'll be sure the lights are displayed in order if the UI uses sort by name instead of index.
+# Set this setting to true when using the simulator with Eneco Toon or other display based systems with sorting,
+# but to false for any voice controlled system.
 simulator.prependIndex  = true
 
 ##########################################################################
@@ -29,11 +31,12 @@ backend.mode.rest          = false
 backend.rest.host       = localhost
 # Backend mode REST specific parameter: port on which to connect to the REST server.
 backend.rest.port       = 3737
-# Backend mode REST specific parameter: base path to prepend to the menu URL's on to the REST server.
+# Backend mode REST specific parameter: base path to prepend to the simLights URL's on to the REST server.
 backend.rest.basePath   = huebridgesimulator
 
 ##########################################################################
 # Section 3: Spring Boot properties derived from the properties above.   #
+# -------------------- No need to edit this section -------------------- #
 ##########################################################################
 
 # The address on which Spring Boot is listening should be the same as the simulator host.
