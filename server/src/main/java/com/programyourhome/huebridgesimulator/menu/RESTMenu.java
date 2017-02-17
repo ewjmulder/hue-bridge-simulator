@@ -1,7 +1,5 @@
 package com.programyourhome.huebridgesimulator.menu;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -17,8 +15,6 @@ import com.programyourhome.huebridgesimulator.model.menu.MenuItem;
 @Component
 @ConditionalOnProperty("backend.mode.rest")
 public class RESTMenu implements Menu {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Value("${backend.rest.host}")
     private String backendHost;
@@ -42,7 +38,6 @@ public class RESTMenu implements Menu {
 
     @Override
     public void menuItemClicked(final String menuItemName, final boolean on) {
-        this.log.info("Menu item 'clicked': " + menuItemName);
         this.restTemplate.put(this.buildBackendUrlMenuItemSelected(menuItemName, on), null);
     }
 

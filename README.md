@@ -7,9 +7,6 @@
 
 #Hue Bridge Simulator#
 
-!! **Update Jan 2017:** This simulator is now also compatible with **[Amazon Alexa](http://alexa.amazon.com)** since it has been extended with responding
-to MSEARCH queries, making it more versatile in general as a Hue Bridge Simulator. !!
-
 ##Goal of the project##
 This project aims to **simulate** a **Philips Hue bridge** on a local network. The setup of the project is to support a custom, programmatic implementation of the lights data and a hook for acting on the event of a light being turned on or off. This way you can 'fool' an already existing Philips Hue graphical user interface into thinking it is turning lights on and off, while actually you have **full programmatic control** over what lights 'exist' and how you would like to **act on light switching**. So instead of just controlling your lights, you can **hook it up to your entire home automation system!**
 

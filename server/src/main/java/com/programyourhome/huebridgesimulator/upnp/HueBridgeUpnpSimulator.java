@@ -1,20 +1,25 @@
 package com.programyourhome.huebridgesimulator.upnp;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.programyourhome.huebridgesimulator.AbstractSimulatorPropertiesBase;
+
 /**
- * This part of the simulator mimics the UPnP broadcast behavior from the hue bridge as closely as possible.
+ * This part of the simulator mimics the UPnP behavior from the hue bridge as closely as possible.
  * This means: every minute 6 NOTIFY messages will be sent. Three different messages, each one sent twice.
  * The messages contain information about the Hue bridge device. Their content is exactly identical to the
  * ones from an actual Philips Hue bridge, except for the 'LOCATION:' and 'uuid:' parts.
@@ -22,9 +27,20 @@ import org.springframework.stereotype.Component;
  * Credits: This code is based on sources in https://github.com/ps3mediaserver/
  */
 @Component
-public class UpnpSender extends AbstractUpnpHandler {
+public class HueBridgeUpnpSimulator extends AbstractSimulatorPropertiesBase {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    // Line feed used in UPnP traffic.
+    private final static String CRLF = "\r\n";
+
+    // IPv4 Multicast channel reserved for SSDP by Internet Assigned Numbers Authority (IANA), must be 239.255.255.250.
+    private final static String IPV4_UPNP_HOST = "239.255.255.250";
+
+    // Multicast channel reserved for SSDP by Internet Assigned Numbers Authority (IANA), must be 1900.
+    private final static int UPNP_PORT = 1900;
+
+    private static InetAddress getUPNPAddress() throws IOException {
+        return InetAddress.getByName(IPV4_UPNP_HOST);
+    }
 
     // The time to wait after boot time before the first broadcast is sent. Take a few seconds for initialization processes to finish.
     private static final long BROADCAST_INITIAL_DELAY = 5000;
@@ -38,7 +54,7 @@ public class UpnpSender extends AbstractUpnpHandler {
     private String upnpMessage2;
     private String upnpMessage3;
 
-    public UpnpSender() {
+    public HueBridgeUpnpSimulator() {
         this.broadcastService = Executors.newScheduledThreadPool(1);
     }
 
@@ -53,7 +69,36 @@ public class UpnpSender extends AbstractUpnpHandler {
         // Start the broadcast service that will send the UPnP messages over the network.
         this.broadcastService.scheduleAtFixedRate(this::broadcastUpnpInfo, BROADCAST_INITIAL_DELAY,
                 BROADCAST_INTERVAL, TimeUnit.MILLISECONDS);
-        this.log.info("UPnP broadcast service started.");
+    }
+
+    /**
+     * Get the multicast socket object to use for sending UPnP messages.
+     *
+     * @return the multicast socket
+     * @throws IOException upon any IO problems
+     */
+    private MulticastSocket getNewMulticastSocket() throws IOException {
+        final MulticastSocket ssdpSocket = new MulticastSocket();
+        ssdpSocket.setReuseAddress(true);
+        final NetworkInterface networkInterface = NetworkInterface.getByInetAddress(InetAddress.getByName(this.getSimulatorHost()));
+        if (networkInterface == null) {
+            throw new IOException("Could not get network interface with host name: '" + this.getSimulatorHost() + "'.");
+        }
+        ssdpSocket.setNetworkInterface(networkInterface);
+
+        // Force the use of an IPv4 address.
+        final Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+        while (inetAddresses.hasMoreElements()) {
+            final InetAddress inetAddress = inetAddresses.nextElement();
+            if (inetAddress instanceof Inet4Address) {
+                ssdpSocket.setInterface(inetAddress);
+                break;
+            }
+        }
+
+        ssdpSocket.setTimeToLive(32);
+        ssdpSocket.joinGroup(getUPNPAddress());
+        return ssdpSocket;
     }
 
     /**
@@ -64,9 +109,9 @@ public class UpnpSender extends AbstractUpnpHandler {
             final MulticastSocket ssdpSocket = this.getNewMulticastSocket();
             this.sendMessageBatch(ssdpSocket);
             ssdpSocket.close();
-            this.log.info("UPnP broadcast messages sent.");
+            System.out.println("Hue Bridge UPnP simulation messages sent.");
         } catch (final IOException e) {
-            this.log.error("IOException during sending of UPnP messages");
+            e.printStackTrace();
         }
     }
 
@@ -90,6 +135,17 @@ public class UpnpSender extends AbstractUpnpHandler {
         this.sendMessage(socket, this.upnpMessage3);
         this.sleep(BROADCAST_INTER_MESSAGE_INTERVAL);
         this.sendMessage(socket, this.upnpMessage3);
+    }
+
+    /**
+     * Send a message over a socket.
+     *
+     * @param socket the socket
+     * @param message the message
+     * @throws IOException upon any IO problems
+     */
+    private void sendMessage(final DatagramSocket socket, final String message) throws IOException {
+        socket.send(new DatagramPacket(message.getBytes(), message.length(), getUPNPAddress(), UPNP_PORT));
     }
 
     /**
@@ -163,5 +219,111 @@ public class UpnpSender extends AbstractUpnpHandler {
         sb.append("").append(CRLF);
         return sb.toString();
     }
+
+    // TODO: add support for replying to M-SEARCH queries. The commented code below might be useful for that.
+    // public static void listen() throws IOException {
+    // final Runnable rAlive = new Runnable() {
+    // @Override
+    // public void run() {
+    // while (true) {
+    // try {
+    // Thread.sleep(delay);
+    // sendAlive();
+    // if (delay == 20000) // every 180s
+    // {
+    // delay = 180000;
+    // }
+    // if (delay == 10000) // after 10, and 30s
+    // {
+    // delay = 20000;
+    // }
+    // } catch (final Exception e) {
+    // LOGGER.debug("Error while sending periodic alive message: " + e.getMessage());
+    // }
+    // }
+    // }
+    // };
+    // aliveThread = new Thread(rAlive, "UPNP-AliveMessageSender");
+    // aliveThread.start();
+    //
+    // final Runnable r = new Runnable() {
+    // @Override
+    // public void run() {
+    // boolean bindErrorReported = false;
+    // while (true) {
+    // try {
+    // // Use configurable source port as per http://code.google.com/p/ps3mediaserver/issues/detail?id=1166
+    // final MulticastSocket socket = new MulticastSocket(PMS.getConfiguration().getUpnpPort());
+    // if (bindErrorReported) {
+    // LOGGER.warn("Finally, acquiring port " + PMS.getConfiguration().getUpnpPort() + " was successful!");
+    // }
+    // final NetworkInterface ni = NetworkConfiguration.getInstance().getNetworkInterfaceByServerName();
+    // if (ni != null) {
+    // socket.setNetworkInterface(ni);
+    // } else if (PMS.get().getServer().getNi() != null) {
+    // LOGGER.trace("Setting multicast network interface: " + PMS.get().getServer().getNi());
+    // socket.setNetworkInterface(PMS.get().getServer().getNi());
+    // }
+    // socket.setTimeToLive(4);
+    // socket.setReuseAddress(true);
+    // socket.joinGroup(getUPNPAddress());
+    // while (true) {
+    // final byte[] buf = new byte[1024];
+    // final DatagramPacket packet_r = new DatagramPacket(buf, buf.length);
+    // socket.receive(packet_r);
+    //
+    // final String s = new String(packet_r.getData());
+    //
+    // final InetAddress address = packet_r.getAddress();
+    // if (s.startsWith("M-SEARCH")) {
+    // final String remoteAddr = address.getHostAddress();
+    // final int remotePort = packet_r.getPort();
+    //
+    // if (PMS.getConfiguration().getIpFiltering().allowed(address)) {
+    // LOGGER.trace("Receiving a M-SEARCH from [" + remoteAddr + ":" + remotePort + "]");
+    //
+    // if (StringUtils.indexOf(s, "urn:schemas-upnp-org:service:ContentDirectory:1") > 0) {
+    // sendDiscover(remoteAddr, remotePort, "urn:schemas-upnp-org:service:ContentDirectory:1");
+    // }
+    //
+    // if (StringUtils.indexOf(s, "upnp:rootdevice") > 0) {
+    // sendDiscover(remoteAddr, remotePort, "upnp:rootdevice");
+    // }
+    //
+    // if (StringUtils.indexOf(s, "urn:schemas-upnp-org:device:MediaServer:1") > 0) {
+    // sendDiscover(remoteAddr, remotePort, "urn:schemas-upnp-org:device:MediaServer:1");
+    // }
+    //
+    // if (StringUtils.indexOf(s, PMS.get().usn()) > 0) {
+    // sendDiscover(remoteAddr, remotePort, PMS.get().usn());
+    // }
+    // }
+    // } else if (s.startsWith("NOTIFY")) {
+    // final String remoteAddr = address.getHostAddress();
+    // final int remotePort = packet_r.getPort();
+    //
+    // LOGGER.trace("Receiving a NOTIFY from [" + remoteAddr + ":" + remotePort + "]");
+    // }
+    // }
+    // } catch (final BindException e) {
+    // if (!bindErrorReported) {
+    // LOGGER.error("Unable to bind to " + PMS.getConfiguration().getUpnpPort()
+    // + ", which means that PMS will not automatically appear on your renderer! "
+    // + "This usually means that another program occupies the port. Please "
+    // + "stop the other program and free up the port. "
+    // + "PMS will keep trying to bind to it...[" + e.getMessage() + "]");
+    // }
+    // bindErrorReported = true;
+    // sleep(5000);
+    // } catch (final IOException e) {
+    // LOGGER.error("UPNP network exception", e);
+    // sleep(1000);
+    // }
+    // }
+    // }
+    // };
+    // listener = new Thread(r, "UPNPHelper");
+    // listener.start();
+    // }
 
 }

@@ -5,8 +5,7 @@ package com.programyourhome.huebridgesimulator.model.connection;
  */
 public enum ErrorType {
 
-    UNAUTHORIZED_USER(1), 
-    RESOURCE_NOT_AVAILABLE(3);
+    USER_NOT_CONNECTED(101);
 
     private int code;
 
