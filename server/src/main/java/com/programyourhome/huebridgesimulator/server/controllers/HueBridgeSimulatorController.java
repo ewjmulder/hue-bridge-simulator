@@ -103,12 +103,11 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      */
     @RequestMapping(value = "api", method = RequestMethod.POST, consumes = "application/json")
     public HueBridgeResponse connect(@RequestBody final ConnectionRequest connectionRequest) {
-        this.log.info("Request to connect for device: " + connectionRequest.getDevicetype());
+        this.log.debug("Request to connect");
         final String username = this.defineUsername(connectionRequest);
         final User user = new User(username, connectionRequest.getDevicetype());
         this.connectedUsers.put(username, user);
         this.logUserActivity(user, ActivityType.CONNECT);
-        this.log.info("Request granted with username: " + username);
         return new ConnectedSuccesfully(username);
     }
 
@@ -122,14 +121,13 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      */
     @RequestMapping(value = "api/{username}/config/whitelist/{usernameToDelete}", method = RequestMethod.DELETE)
     public HueBridgeResponse disconnect(@PathVariable("username") final String username, @PathVariable("usernameToDelete") final String usernameToDelete) {
-        this.log.info("Request to disconnect for username: " + usernameToDelete);
-        // final UserLookup userLookup = this.lookupUser(username);
-        // return this.executeOrError(userLookup, () -> {
-        // TODO: As long as we don't have persistent users, we should always allow a client to delete an 'old' user.
-        this.connectedUsers.remove(usernameToDelete);
-        // this.logUserActivity(userLookup.getUser(), ActivityType.DISCONNECT, usernameToDelete);
-        return new DeletedSuccesfully(usernameToDelete);
-        // });
+        this.log.debug("Request to disconnect");
+        final UserLookup userLookup = this.lookupUser(username);
+        return this.executeOrError(userLookup, () -> {
+            this.connectedUsers.remove(usernameToDelete);
+            this.logUserActivity(userLookup.getUser(), ActivityType.DISCONNECT, usernameToDelete);
+            return new DeletedSuccesfully(usernameToDelete);
+        });
     }
 
     /**
@@ -182,7 +180,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/x-www-form-urlencoded")
     public HueBridgeResponse setLight(@RequestBody final String stateUrlEncoded, @PathVariable("username") final String username,
             @PathVariable("index") final int index) throws IOException {
-        this.log.info("Request to change the state of light " + index + " (form wrapper)");
+        this.log.debug("Request to change the state of light " + index + " (form wrapper)");
         return this.setLight(new ObjectMapper().readValue(this.urlDecode(stateUrlEncoded), SimHueLightState.class), username, index);
     }
 
@@ -198,7 +196,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/json")
     public HueBridgeResponse setLight(@RequestBody final SimHueLightState state, @PathVariable("username") final String username,
             @PathVariable("index") final int index) {
-        this.log.info("Request to change the state of light " + index);
+        this.log.debug("Request to change the state of light " + index);
         final UserLookup userLookup = this.lookupUser(username);
         return this.executeOrError(userLookup, () -> {
             this.logUserActivity(userLookup.getUser(), ActivityType.SET_LIGHT, index + " -> " + (state.isOn() ? "on" : "off"));
