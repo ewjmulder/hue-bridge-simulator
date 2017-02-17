@@ -182,7 +182,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/x-www-form-urlencoded")
     public HueBridgeResponse setLight(@RequestBody final String stateUrlEncoded, @PathVariable("username") final String username,
             @PathVariable("index") final int index) throws IOException {
-        this.log.debug("Request to change the state of light " + index + " (form wrapper)");
+        this.log.info("Request to change the state of light " + index + " (form wrapper)");
         return this.setLight(new ObjectMapper().readValue(this.urlDecode(stateUrlEncoded), SimHueLightState.class), username, index);
     }
 
@@ -198,7 +198,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/json")
     public HueBridgeResponse setLight(@RequestBody final SimHueLightState state, @PathVariable("username") final String username,
             @PathVariable("index") final int index) {
-        this.log.debug("Request to change the state of light " + index);
+        this.log.info("Request to change the state of light " + index);
         final UserLookup userLookup = this.lookupUser(username);
         return this.executeOrError(userLookup, () -> {
             this.logUserActivity(userLookup.getUser(), ActivityType.SET_LIGHT, index + " -> " + (state.isOn() ? "on" : "off"));
