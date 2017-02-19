@@ -1,16 +1,21 @@
 package com.programyourhome.huebridgesimulator.server.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -51,17 +56,48 @@ import com.programyourhome.huebridgesimulator.proxy.SimHueBridge;
 @RestController
 public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBase {
 
+    private static final String AUTHORIZED_USERS_FILENAME = "authorizedUsers.txt";
+    private static final String AUTHORIZED_USERS_SEPARATOR = " --- ";
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     private SimHueBridge hueBridge;
 
-    private final Map<String, User> connectedUsers;
+    private final File authorizedUsersFile;
+    private final Map<String, User> authorizedUsers;
     private final SortedMap<LocalDateTime, UserActivity> userActivity;
 
-    public HueBridgeSimulatorController() {
-        this.connectedUsers = new HashMap<>();
+    public HueBridgeSimulatorController() throws IOException {
+        this.authorizedUsers = new HashMap<>();
         this.userActivity = new TreeMap<>();
+        File propertiesFile = new File(System.getProperty("simulator.properties.location"));
+        this.authorizedUsersFile = new File(propertiesFile.getParentFile() + "/" + AUTHORIZED_USERS_FILENAME);
+        this.loadAuthorizedUsers();
+    }
+
+    private synchronized void loadAuthorizedUsers() throws IOException {
+        this.log.debug("Loading authorized users from file: [" + this.authorizedUsersFile + "]");
+        if (!this.authorizedUsersFile.exists()) {
+            this.authorizedUsersFile.createNewFile();
+        }
+        IOUtils.readLines(new FileInputStream(this.authorizedUsersFile), Charset.forName("UTF-8")).stream()
+                .map(line -> line.split(AUTHORIZED_USERS_SEPARATOR))
+                .map(splitted -> new User(splitted[0], splitted[1]))
+                .forEach(user -> this.authorizedUsers.put(user.getUsername(), user));
+        this.log.debug("Authorized users after loading from file: " + this.authorizedUsers.values());
+    }
+
+    private synchronized void saveAuthorizedUsers() {
+        this.log.debug("Saving authorized users to file: " + this.authorizedUsersFile);
+        try {
+            List<String> lines = this.authorizedUsers.values().stream()
+                    .map(user -> user.getUsername() + AUTHORIZED_USERS_SEPARATOR + user.getDeviceType())
+                    .collect(Collectors.toList());
+            IOUtils.writeLines(lines, "\n", new FileOutputStream(this.authorizedUsersFile), Charset.forName("UTF-8"));
+        } catch (Exception e) {
+            throw new IllegalStateException("Exception during saving of users.", e);
+        }
     }
 
     /**
@@ -97,7 +133,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
 
     /**
      * Processes a post to connect a new user to the bridge. The user and it's device type will be saved in an internal
-     * collection of connected users.
+     * collection of connected users and a persistent file of authorized users.
      *
      * @param connectionRequest a JSON connection request
      * @return a 'connected successfully' result
@@ -107,7 +143,8 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         this.log.info("Request to connect for device: " + connectionRequest.getDevicetype());
         final String username = this.defineUsername(connectionRequest);
         final User user = new User(username, connectionRequest.getDevicetype());
-        this.connectedUsers.put(username, user);
+        this.authorizedUsers.put(username, user);
+        this.saveAuthorizedUsers();
         this.logUserActivity(user, ActivityType.CONNECT);
         this.log.info("Request granted with username: " + username);
         return new ConnectedSuccesfully(username);
@@ -127,7 +164,8 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         // final UserLookup userLookup = this.lookupUser(username);
         // return this.executeOrError(userLookup, () -> {
         // TODO: As long as we don't have persistent users, we should always allow a client to delete an 'old' user.
-        this.connectedUsers.remove(usernameToDelete);
+        this.authorizedUsers.remove(usernameToDelete);
+        this.saveAuthorizedUsers();
         // this.logUserActivity(userLookup.getUser(), ActivityType.DISCONNECT, usernameToDelete);
         return new DeletedSuccesfully(usernameToDelete);
         // });
@@ -209,13 +247,13 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     }
 
     /**
-     * Meta information about the simulated brigde: get a list of connected users.
+     * Meta information about the simulated brigde: get a list of authorized users.
      *
      * @return the list of connected users
      */
-    @RequestMapping(value = "simulation/connectedUsers", method = RequestMethod.GET)
+    @RequestMapping(value = "simulation/authorizedUsers", method = RequestMethod.GET)
     public Collection<User> getConnectedUsers() {
-        return this.connectedUsers.values();
+        return this.authorizedUsers.values();
     }
 
     /**
@@ -264,14 +302,14 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
     }
 
     /**
-     * Loopup the user with the provided username. This is presented as a lookup result that contains either
+     * Lookup the user with the provided username. This is presented as a lookup result that contains either
      * the user or an error that occured during lookup.
      *
      * @param username the username
      * @return the user lookup result
      */
     private UserLookup lookupUser(final String username) {
-        final User user = this.connectedUsers.get(username);
+        final User user = this.authorizedUsers.get(username);
         final HueBridgeResponse error;
         if (user == null) {
             this.log.warn("Request from unautorized user: " + username);

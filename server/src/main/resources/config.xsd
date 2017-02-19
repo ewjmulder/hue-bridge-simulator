@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://programyourhome.com/hue-bridge-simulator"
+    targetNamespace="http://programyourhome.com/hue-bridge-simulator" elementFormDefault="qualified">
+
+    <xsd:element name="config">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="metadata" type="metadata" minOccurs="1" maxOccurs="1" />
+                <xsd:element name="simLights" type="simLights" minOccurs="1" maxOccurs="1" />
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="metadata">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="simLights">
+        <xsd:sequence>
+            <xsd:element name="simLight" type="simLight" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="simLight">
+        <xsd:sequence>
+            <xsd:element name="id" type="xsd:int" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="color" type="color" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="getState" type="getState" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="setState" type="setState" minOccurs="1" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="color">
+        <xsd:sequence>
+            <xsd:element name="red" type="xsd:int" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="green" type="xsd:int" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="blue" type="xsd:int" minOccurs="1" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="getState">
+        <xsd:sequence>
+            <xsd:element name="url" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            <xsd:choice>
+                <xsd:element name="stringResponseFilter" type="responseFilter" minOccurs="1" maxOccurs="1" />
+                <xsd:element name="regexResponseFilter" type="responseFilter" minOccurs="1" maxOccurs="1" />
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="responseFilter">
+        <xsd:sequence>
+            <xsd:element name="patternOn" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="patternOff" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="setState">
+        <xsd:sequence>
+            <xsd:element name="urlOn" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="urlOff" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

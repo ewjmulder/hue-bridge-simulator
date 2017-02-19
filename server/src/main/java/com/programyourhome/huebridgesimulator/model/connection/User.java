@@ -21,4 +21,9 @@ public class User {
         return this.deviceType;
     }
 
+    @Override
+    public String toString() {
+        return "User [username = '" + this.username + "', deviceType = '" + this.deviceType + "']";
+    }
+
 }

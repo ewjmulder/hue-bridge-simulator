@@ -17,6 +17,45 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.11.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <schemaDirectory>src/main/resources</schemaDirectory>
+                    <generatePackage>com.programyourhome.huebridgesimulator.config</generatePackage>
+
+                    <extension>true</extension>
+                    <args>
+                        <arg>-Xxew</arg>
+                        <arg>-Xxew:instantiate lazy</arg>
+
+                        <arg>-XtoString</arg>
+                        <arg>-Xequals</arg>
+                        <arg>-XhashCode</arg>
+                    </args>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.jaxb-xew-plugin</groupId>
+                            <artifactId>jaxb-xew-plugin</artifactId>
+                            <version>1.8</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.jvnet.jaxb2_commons</groupId>
+                            <artifactId>jaxb2-basics</artifactId>
+                            <version>0.9.0</version>
+                        </plugin>
+                    </plugins>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.5.0</version>
@@ -70,6 +109,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>jaxb2-basics</artifactId>
+            <version>0.9.0</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

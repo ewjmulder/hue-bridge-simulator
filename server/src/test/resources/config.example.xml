@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://programyourhome.com/hue-bridge-simulator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://programyourhome.com/hue-bridge-simulator ../../main/resources/config.xsd">
+    <metadata>
+        <name>Example test</name>
+        <description>Some example test</description>
+    </metadata>
+    <simLights>
+        <simLight>
+            <id>1</id>
+            <name>Purple test</name>
+            <color>
+                <red>255</red>
+                <green>0</green>
+                <blue>255</blue>
+            </color>
+            <getState>
+                <url>http://192.168.2.37:3737/hue/lights/1</url>
+                <regexResponseFilter>
+                    <patternOn>"on".*:tr.e?</patternOn>
+                    <patternOff>"on".*:fa.se?</patternOff>
+                </regexResponseFilter>
+            </getState>
+            <setState>
+                <urlOn>http://192.168.2.37:3737/hue/lights/1/on</urlOn>
+                <urlOff>http://192.168.2.37:3737/hue/lights/1/off</urlOff>
+            </setState>
+        </simLight>
+    </simLights>
+</config>

@@ -1,10 +1,15 @@
 X Merge all modules into 1? Not really any advantage in making it so split up.
 X Replace ip/port/mac in description.xml at runtime instead of buildtime
 X Listen to and respond to M-SEARCH
-- Logging instead of sysouts and e.printStackTrace()
+X Logging instead of sysouts and e.printStackTrace()
 - Add unit tests
-- Persist authorized users on disk!
+X Persist authorized users on disk!
 - Create hardware compatibility mode Toon/Alexa in properties to not let Alexa grab all Toon sim devices
 X Rename 'menu' stuff to more appropriate naming (taking a good look at all naming regarding new Alexa use)
 - Update README with more Alexa stuff
 - Complete update of README for 2.0
+- Make example config XML file in src/test/resources (and unit test to validate against XSD)
+- Implement extra filters:
+                    <xsd:element name="jsonPathResponseFilter" type="responseFilter" minOccurs="1" maxOccurs="1" />
+                    <xsd:element name="jqResponseFilter" type="responseFilter" minOccurs="1" maxOccurs="1" />
+                    <xsd:element name="xpathResponseFilter" type="responseFilter" minOccurs="1" maxOccurs="1" />
