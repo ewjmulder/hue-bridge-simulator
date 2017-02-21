@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -18,6 +17,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -120,15 +120,15 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
 
     /**
      * Special variant of posting a connect with mime type 'application/x-www-form-urlencoded'. This is needed, because
-     * otherwise JSON deserialization will trip over de URL encoded characters. This method will perform the URL decoding and
-     * then forward the JSON string to the connect method with the 'proper' mime type.
+     * a form post is actually the wrong content type, so should be handled separately. Otherwise Spring will
+     * not understand the request and has valid HTTP spec reasons to do so.
      *
      * @see connect for further details
      */
     @RequestMapping(value = "api", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded")
-    public HueBridgeResponse connectUrlEncoded(@RequestBody final String connectionRequestUrlEncoded) throws IOException {
+    public HueBridgeResponse connect(final HttpServletRequest request) throws IOException {
         this.log.debug("Request to connect (form wrapper)");
-        return this.connect(new ObjectMapper().readValue(this.urlDecode(connectionRequestUrlEncoded), ConnectionRequest.class));
+        return this.connect(new ObjectMapper().readValue(this.extractPlainJson(request.getParameterMap()), ConnectionRequest.class));
     }
 
     /**
@@ -140,7 +140,7 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
      */
     @RequestMapping(value = "api", method = RequestMethod.POST, consumes = "application/json")
     public HueBridgeResponse connect(@RequestBody final ConnectionRequest connectionRequest) {
-        this.log.info("Request to connect for device: " + connectionRequest.getDevicetype());
+        this.log.info("Request to connect with body: " + connectionRequest);
         final String username = this.defineUsername(connectionRequest);
         final User user = new User(username, connectionRequest.getDevicetype());
         this.authorizedUsers.put(username, user);
@@ -213,16 +213,16 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
 
     /**
      * Special variant of putting a set light with mime type 'application/x-www-form-urlencoded'. This is needed, because
-     * otherwise JSON deserialization will trip over de URL encoded characters. This method will perform the URL decoding and
-     * then forward the JSON string to the connect method with the 'proper' mime type.
+     * a form post is actually the wrong content type, so should be handled separately. Otherwise Spring will
+     * not understand the request and has valid HTTP spec reasons to do so.
      *
      * @see setLight for further details
      */
     @RequestMapping(value = "api/{username}/lights/{index}/state", method = RequestMethod.PUT, consumes = "application/x-www-form-urlencoded")
-    public HueBridgeResponse setLight(@RequestBody final String stateUrlEncoded, @PathVariable("username") final String username,
+    public HueBridgeResponse setLight(final HttpServletRequest request, @PathVariable("username") final String username,
             @PathVariable("index") final int index) throws IOException {
         this.log.debug("Request to change the state of light " + index + " (form wrapper)");
-        return this.setLight(new ObjectMapper().readValue(this.urlDecode(stateUrlEncoded), SimHueLightState.class), username, index);
+        return this.setLight(new ObjectMapper().readValue(this.extractPlainJson(request.getParameterMap()), SimHueLightState.class), username, index);
     }
 
     /**
@@ -320,13 +320,17 @@ public class HueBridgeSimulatorController extends AbstractSimulatorPropertiesBas
         return new UserLookup(user, error);
     }
 
-    private String urlDecode(final String input) throws IOException {
-        String output = URLDecoder.decode(input, "UTF8");
-        if (output.endsWith("=")) {
-            // Weird case of a trailing '=', that should be removed.
-            output = output.substring(0, output.length() - 1);
-        }
-        return output;
+    /**
+     * In case an application/x-www-form-urlencoded request comes in, we will get a multi value map with the parameters in
+     * the request. This is actually wrong, since it should be treated as a JSON request, but the sender did not
+     * set the right content type. So we know for sure the actual plain JSON we are looking for is the name of the
+     * one and only key in the map.
+     *
+     * @param multiMap
+     * @return
+     */
+    private String extractPlainJson(final Map<String, String[]> parameterMap) {
+        return parameterMap.keySet().iterator().next();
     }
 
     /**

@@ -26,4 +26,9 @@ public class ConnectionRequest {
         this.username = username;
     }
 
+    @Override
+    public String toString() {
+        return "ConnectionRequest [username = '" + this.username + "', devicetype = '" + this.devicetype + "']";
+    }
+
 }

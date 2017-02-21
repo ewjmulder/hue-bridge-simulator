@@ -29,9 +29,9 @@ import com.programyourhome.huebridgesimulator.model.SimLightSource;
 /**
  * A light source implementation that takes it's data from a configuration file.
  * The configuration file should be according to the schema of the config XSD.
- * It contains one or more simulated light source definitions, with each
- * a section on how to get the current state of the light source and
- * a section on how to change the state of the light source.
+ * It contains one or more simulated light definitions, with each
+ * a section on how to get the current state of the sim light and
+ * a section on how to change the state of the sim light.
  * See the XSD and README for more information.
  */
 @Component
@@ -55,6 +55,7 @@ public class ConfigLightSource implements SimLightSource {
         File propertiesFile = new File(System.getProperty("simulator.properties.location"));
         File lightSourceConfigFile = new File(propertiesFile.getParentFile() + "/" + this.configFilename);
         this.config = this.loadConfig(lightSourceConfigFile);
+        this.log.info("Loaded config: [" + this.config.getMetadata().getName() + "]");
     }
 
     /**
